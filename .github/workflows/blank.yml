@@ -1,0 +1,109 @@
+# This is a basic workflow to help you get started with Actions
+---
+title: "Patent Applications From 1963-2020"
+author: "Damarcus Pitt"
+date: "Sept 16,2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+# PACKAGE INSTALLATION
+I began by installing packages I would use, specifically dplyr, ggplot, and tidyverse
+```{r Package Installation}
+install.packages("dplyr")
+library(dplyr)
+install.packages("ggplot")
+library(ggplot2)
+install.packages("tidyverse")
+library(tidyverse)
+library(xlsx)
+```
+# FILE IMPORT
+Using the Files pane and read.xlsx(), I imported an Excel spreadsheet to RStudio Cloud.
+```{r file reading}
+patents_count_spreadsheet<-read.xlsx("patents count spreadsheet.xlsx", 
+                                     sheetName = "Years and Totals")
+patents_count_spreadsheet
+```
+# DATA CLEANING
+Then, I performed data cleaning, renaming both columns and dropping the last row because it only held a sum.
+```{r data cleaning}
+
+clean_patent_data<-rename(patents_count_spreadsheet,"Year"="Row.Labels",
+                       "Patent_Applications"="Sum.of.Total.Patent.Applications..") 
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+clean_patent_data<-clean_patent_data[-59,]
+```
+# FULL DATA PLOT
+
+Next, I made a plot using ggplot for a first look at the data.
+```{r all years plot}
+
+ggplot(data=clean_patent_data)+
+  geom_point(mapping=aes(x=Year,y=Patent_Applications))+
+  labs(title="Total Patents 1963 to 2020",y="Patent Applications")+
+    scale_x_discrete(guide=guide_axis(n.dodge=2))+
+  theme(axis.text.x = element_text(size=10,angle = 45, vjust = 1, hjust=1))
+```
+
+Since 1963, patent applications have increased, in either with a polynomial or exponential trend. Examining further, I identified three sections to explore where the slope appeared to change most noticeably, creating three smaller plots based on year ranges: 1963-1985,1986-1995, & 1996-2016
+
+# 1963 TO 1985 PLOT
+
+```{r 1963-1985 plot}
+clean_patent_data_63_to_85<-clean_patent_data[1:23,] 
+ggplot(data=clean_patent_data_63_to_85)+ 
+  geom_point(mapping=aes(x=Year,y=Patent_Applications))+ 
+  labs(title="Patent Applications 1963-1985",y="Patent Applications")+
+  theme(axis.text.x = element_text(size=10,angle = 45, vjust = 1, hjust=1))
+```
+
+Analysis
+------
+This plot shows a possibly linear trend, though this interpretation is limited from due to the possible outliers in the data.  An explanation for them could be:
+
+* rapidly changing patent laws
+* the patent filing process itself being understood by few people.
+
+# 1986 TO 1995 PLOT
+
+```{r 1986-1995 plot}
+clean_patent_data_86_to_95<-clean_patent_data[24:33,]
+ggplot(data=clean_patent_data_86_to_95)+
+  geom_point(mapping=aes(x=Year,y=Patent_Applications))+
+  labs(title="Patent Applications 1986 to 1995",y="Patent Applications")+
+  theme(axis.text.x = element_text(size=10,angle = 45, vjust = 1, hjust=1))
+```
+
+Analysis
+------
+This plot is much cleaner with fewer outliers.  However, this could be due to the small amount of data point for the particular span of time I examined.  If not, a better understanding of the patenting process could explain improved linearity.
+
+# 1996 TO 2020 PLOT
+
+```{r 1996-2020 plot}
+clean_patent_data_96_to_20<-clean_patent_data[34:58,]
+ggplot(data=clean_patent_data_96_to_20)+
+  geom_point(mapping=aes(x=Year,y=Patent_Applications))+
+  labs(title="Patent Applications 1996 to 2020",y="Patent Applications")+
+  theme(axis.text.x = element_text(size=10,angle = 45, vjust = 1, hjust=1))
+```
+
+Analysis
+------
+Finally, the last plot.  This time, there are a good amount of data points as well as a very linear-looking trend.  The only time this does not appear linear is near the end where the trend seems to plateau.  Since this happens near the end around 2016 on the graph, I think greater proliferation of the internet and social media creates ways to circumvent the patent application process.  These might include:
+
+* getting fake patents from a site
+* research dissuading applying since their patent will be too similar to others'
+
+Further investigation would delve into patents laws and how they changed over time and patent-related crime rates and whether or not they increased.
+
+```{r Resources}
+```
+
+Resources
+============
+My data was gotten from the following .gov site:
+
+US Patent and Trademark Office
+(https://www.uspto.gov/web/offices/ac/ido/oeip/taf/us_stat.htm)
